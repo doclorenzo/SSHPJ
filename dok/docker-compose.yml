@@ -1,0 +1,8 @@
+version: "3"
+services:
+    influxdb:
+        image: influxdb:2.0
+        container_name: dokInfluxUni
+        ports:
+            - 0.0.0.0:8888:8086
+      

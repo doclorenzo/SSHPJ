@@ -1,0 +1,3 @@
+#!/bin/bash
+docker-composedocker up
+dok_influxdb_1
