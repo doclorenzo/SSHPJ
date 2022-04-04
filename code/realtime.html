@@ -1,0 +1,106 @@
+<html>
+    <head>
+        <title>Real-Time values</title>
+        <meta charset="utf-8" />
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">       
+        <script>
+            function InitChart(){
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+            data: {
+                labels: [],
+                datasets: [{
+                  type: 'line',
+                    data: [],
+                    label:"CO2",
+                    borderColor: [
+                      'rgb(255, 99, 132)',
+                      'rgb(54, 162, 235)',
+                      'rgb(255, 205, 86)'
+                    ],
+                    backgroundColor: [
+                      'rgb(255, 99, 132)',
+                      'rgb(54, 162, 235)',
+                      'rgb(255, 205, 86)'], 
+                    hoverOffset: 4,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                layout: {
+                  padding: {
+                      right: 50
+                  }
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    }
+                }
+            }
+        });
+    }
+            function real(){
+                var change= new Date();
+                change.setSeconds(change.getHours() - 10);
+                var current= new Date();
+                agestart=change.toISOString();
+                agestop=current.toISOString();
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.onload = function() { 
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                var answ = String(xmlHttp.responseText);
+                console.log(answ);
+                answ=answ.substring(1,answ.length-1)
+                const data1 = answ.split(',');
+                console.log(data1);
+                let data=data1[1];
+                let ora=data1[2];
+                addData(data,ora);
+                    $("#actual").html(answ);
+                }
+            xmlHttp.open("GET", "../tomato?agestart="+agestart+"&agestop="+agestop+"&yesy=last()", true); // false for synchronous request
+            xmlHttp.send(null);
+            }
+
+        function addData(data, label) {
+            myChart.data.labels.push(label);
+            myChart.data.datasets.forEach((dataset) => {
+                dataset.data.push(data);
+            });
+            myChart.update();
+        }
+
+      setInterval(real(), 10000);
+        </script>
+        <style>
+        div.box
+        {
+            overflow:auto;
+            margin: auto;
+            border: 3px solid ;
+            padding: 10px;
+            font-family: "Courier New";
+        }
+        </style>
+    </head>
+    <body>
+        <div>
+        <div id="actual" align="center" class="box" style="color:#800000;background-color: #ffcc66;float:center;width:60%;height:90.3%;margin-top: 23px;border: 2px solid #800000;">
+        </div><br>
+        <div style="float:center;background-color: white;margin-left:23px; margin-right: 23px; margin-top: 30px;">
+        <canvas id="myChart" width="100" height="40" style="background-color:white" onload="InitChart()">tfy</canvas>
+        </div> 
+        </div>  
+    </body>
+</html>
