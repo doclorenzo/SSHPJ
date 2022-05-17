@@ -1,0 +1,236 @@
+<html>
+    <head>
+        <title>Real-Time values</title>
+        <meta charset="utf-8" />
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">       
+        <script>
+            let myChart, ctx;
+            ladroC=true;
+            ladroT=true;
+            ladroH=true;
+            fedeC=0;
+            fedeT=0;
+            fedeH=0;
+            oraH=[];
+            oraT=[];
+            oraC=[];
+            dataH=[];
+            dataT=[];
+            dataC=[];
+            data=[];
+            ora=[];
+
+            function sus(){
+            var timeleft = 9;
+            var downloadTimer = setInterval(function(){
+            if(timeleft <= 0){
+                clearInterval(downloadTimer);
+            }
+            document.getElementById("progressBar").value = 10 - timeleft;
+            timeleft -= 1;
+            }, 1000);}
+
+            function real(){
+                console.log("Real Called");
+                var change= new Date();
+                change.setSeconds(change.getHours() - 100);
+                change.setSeconds(change.getHours() + 100);
+                var current= new Date();
+                agestart=change.toISOString();
+                agestop=current.toISOString();
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.onload = function() { 
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                    var answ = String(xmlHttp.responseText);
+                    console.log(answ);
+                    
+                    answ=answ.substring(1,answ.length-1);
+                    answ2=answ.toString();
+                    answ=answ.replaceAll(",","&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+                    const data1 = answ2.split(',');
+                    console.log(data1);
+                    data.push(data1[1]);
+                    ora.push(data1[2]);
+                    i=0;
+                    while (i<data1.length){
+                        if(data1[i].indexOf('H') != -1){
+                        dataH.push(data1[i+1]);
+                        oraH.push(data1[i+2].substring(0,data1[i+2].lenght-13));
+                        }
+                        else if (data1[i].indexOf('T') != -1){
+                        dataT.push(data1[i+1]);
+                        oraT.push(data1[i+2].substring(0,data1[i+2].lenght-13));
+                        }
+                        else if(data1[i].indexOf('C') != -1){
+                        dataC.push(data1[i+1]);
+                        oraC.push(data1[i+2].substring(0,data1[i+2].lenght-13));
+                        }
+                        i+=3;
+                    }
+                    s=answ+"<br>"+document.getElementById("actual").innerHTML;
+                    document.getElementById("actual").innerHTML=s+"<br>";
+                    
+                    chartH(dataH,oraH);
+                    chartT(dataT,oraT);
+                    chartC(dataC,oraC);
+                }
+            xmlHttp.open("GET", "/../tomato?dataType=CO2.TEM.HUM.&agestart="+agestart+"&agestop="+agestop+"&yesy=last()", true); // false for synchronous request
+            xmlHttp.send(null);
+            }
+                
+      function chartH(data,ora){
+            if(ladroH==false) {
+              fedeH.destroy();
+            }else {
+              ladroH=false;
+            }
+            const ctx = document.getElementById('myChartH').getContext('2d');
+            const myChartH = new Chart(ctx, {
+            data: {
+                labels: ora,
+                datasets: [{
+                  type: 'line',
+                    data: data,
+                    label:"Humidity",
+                    borderColor: "yellow",
+                    backgroundColor: "yellow",
+                    hoverOffset: 4,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                layout: {
+                  padding: {
+                      right: 50
+                  }
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    }
+                }
+            }
+        });
+        fedeH=myChartH;
+        return;       
+      }
+      function chartT(data,ora){
+            if(ladroT==false) {
+              fedeT.destroy();
+            }else {
+              ladroT=false;
+            }
+            const ctx = document.getElementById('myChartT').getContext('2d');
+            const myChartT = new Chart(ctx, {
+            data: {
+                labels: ora,
+                datasets: [{
+                  type: 'line',
+                    data: data,
+                    label:"Temperature",
+                    borderColor: "blue",
+                    backgroundColor: "blue",
+                    hoverOffset: 4,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                layout: {
+                  padding: {
+                      right: 50
+                  }
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    }
+                }
+            }
+        });
+        fedeT=myChartT;
+        return;       
+      }
+      function chartC(data,ora){
+            if(ladroC==false) {
+              fedeC.destroy();
+            }else {
+              ladroC=false;
+            }
+            const ctx = document.getElementById('myChartC').getContext('2d');
+            const myChartC = new Chart(ctx, {
+            data: {
+                labels: ora,
+                datasets: [{
+                  type: 'line',
+                    data: data,
+                    label:"CO2",
+                    borderColor: "red",
+                    backgroundColor: "red", 
+                    hoverOffset: 4,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                layout: {
+                  padding: {
+                      right: 50
+                  }
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    }
+                }
+            }
+        });
+        fedeC=myChartC;
+        return;       
+      }
+        setInterval(real, 10000); 
+        setInterval(sus, 10000); 
+        </script>
+        <style>
+            div.box
+            {
+                overflow:auto;
+                margin: auto;
+                padding: 10px;
+                font-family: "sans serif";
+            }
+        </style>
+    </head>
+    <body onload="sus()" >
+        <div>
+            <p align="center"><strong style="font-family: sans-serif; font-size: 30; color:red">REAL-TIME MEASURES</strong></p>
+        <div id="actual" align="center" class="box" style="color:black;background-color:white;float:center;width:60%;height:50%;margin-top: 23px;">
+        </div><br>
+        <progress value="0" max="10" id="progressBar" style="width:100% ;height:35px;"></progress>
+        <div style="float:center;background-color: white;margin-left:23px; margin-right: 23px; margin-top: 30px;">
+        <canvas id="myChartT" width="100" height="20" style="background-color:white" >tfy</canvas>
+        <canvas id="myChartH" width="100" height="20" style="background-color:white" >tfy</canvas>
+        <canvas id="myChartC" width="100" height="20" style="background-color:white" >tfy</canvas>
+
+        </div> 
+        </div>  
+    </body>
+</html>

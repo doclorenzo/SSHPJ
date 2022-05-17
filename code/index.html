@@ -1,0 +1,399 @@
+<html>
+  <head>
+    <title>CO2 outdoor UniMoRe</title>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script>
+      i=true;
+      ladroH=true;
+      ladroT=true;
+      ladroC=true;
+
+      function redirect(){
+        open("/realtime"); // false for synchronous 
+      }
+      
+      function chartH(data,ora){
+        if (data.length == 0) {
+          if (ladroH ==false) fedeH.destroy();
+          return;
+        }
+          if(ladroH==false) {
+            fedeH.destroy();
+          }
+          ladroH=false;
+          
+            const ctx = document.getElementById("myChartH").getContext('2d');
+            const myChartH = new Chart(ctx, {
+            data: {
+                labels: ora,
+                datasets: [{
+                  type: 'line',
+                    data: data,
+                    label:"Humidity",
+                    borderColor: "blue",
+                    backgroundColor: "blue",
+                    hoverOffset: 4,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                layout: {
+                  padding: {
+                      right: 50
+                  }
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    }
+                }
+            }
+        });
+        fedeH=myChartH;
+        return;       
+      }
+
+      function chartT(data,ora){
+        if (data.length == 0) {
+          if (ladroT ==false) fedeT.destroy();
+          return;
+        }
+          if(ladroT==false) {
+            fedeT.destroy();
+          }
+          ladroT=false;
+          
+            const ctx = document.getElementById("myChartT").getContext('2d');
+            const myChartT = new Chart(ctx, {
+            data: {
+                labels: ora,
+                datasets: [{
+                  type: 'line',
+                    data: data,
+                    label:"Temperature",
+                    borderColor: "red",
+                    backgroundColor: "red",
+                    hoverOffset: 4,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                layout: {
+                  padding: {
+                      right: 50
+                  }
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    }
+                }
+            }
+        });
+        fedeT=myChartT;
+        return;       
+      }
+
+      function chartC(data,ora){
+        if (data.length == 0) {
+          if (ladroC ==false) fedeC.destroy();
+          return;
+        }
+          if(ladroC==false) {
+            fedeC.destroy();
+          }
+          ladroC=false;
+          
+            const ctx = document.getElementById("myChartC").getContext('2d');
+            const myChartC = new Chart(ctx, {
+            data: {
+                labels: ora,
+                datasets: [{
+                  type: 'line',
+                    data: data,
+                    label:"CO2",
+                    borderColor: "yellow",
+                    backgroundColor: "yellow",
+                    hoverOffset: 4,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                layout: {
+                  padding: {
+                      right: 50
+                  }
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    }
+                }
+            }
+        });
+        fedeC=myChartC;
+        return;       
+      }
+
+      function valida() {
+        if (!i){
+          z=document.getElementById("time").value.replace(/[hms]/g, '');
+          var change= new Date();
+          if (document.getElementById("time").value.indexOf('h') != -1){
+            change.setHours(change.getHours() - parseInt(z));
+          }
+          else if(document.getElementById("time").value.indexOf('m') != -1){
+            change.setMinutes(change.getMinutes() - parseInt(z));
+          }
+          else if(document.getElementById("time").value.indexOf('s') != -1){
+            change.setSeconds(change.getSeconds() - parseInt(z));
+          }
+          var current= new Date();
+          agestart=change.toISOString();
+          agestop=current.toISOString();
+        }
+        else{
+          agestart=document.getElementById("agestart").value+"T"+document.getElementById("hourstart").value+".000Z"
+          agestop=document.getElementById("agestop").value+"T"+document.getElementById("hourstop").value+".000Z"
+        }
+        dataType=""
+        
+        if(document.getElementById("CO2").checked){
+          console.log(document.getElementById("CO2").checked);
+          dataType+="CO2."
+        }
+        if(document.getElementById("TEM").checked){
+          dataType+="TEM."
+        }
+        if(document.getElementById("HUM").checked){
+          dataType+="HUM."
+        }
+        console.log(dataType  );
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onload = function() { 
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+              var answ = String(xmlHttp.responseText);
+              console.log(answ);
+              answ=answ.substring(1,answ.length-1);
+              const data1 = answ.split(',');
+              console.log(data1);
+              oraH=[];
+              oraT=[];
+              oraC=[];
+              dataH=[];
+              dataT=[];
+              dataC=[];
+              i=0;
+              while (i<data1.length){
+                if(data1[i].indexOf('H') != -1){
+                  dataH.push(data1[i+1]);
+                  oraH.push(data1[i+2].substring(0,data1[i+2].length-13));
+                }
+                else if (data1[i].indexOf('T') != -1){
+                  dataT.push(data1[i+1]);
+                  oraT.push(data1[i+2].substring(0,data1[i+2].length-13));
+                }
+                else if(data1[i].indexOf('C') != -1){
+                  dataC.push(data1[i+1]);
+                  oraC.push(data1[i+2].substring(0,data1[i+2].length-13));
+                }
+                i+=3;
+              }
+              console.log(dataC);
+              console.log(dataH);
+              console.log(dataT);
+              chartH(dataH,oraH);
+              chartT(dataT,oraT);
+              chartC(dataC,oraC);
+              $("#actual").html(answ);
+              }
+        xmlHttp.open("GET", "/tomato?dataType="+dataType+"&agestart="+agestart+"&agestop="+agestop, true); // false for synchronous request
+        xmlHttp.send(null);
+      }
+
+    function hide(){
+      if (i){
+        document.getElementById("agestart").disabled = true;
+        document.getElementById("agestop").disabled = true;
+        document.getElementById("hourstart").disabled = true;
+        document.getElementById("hourstop").disabled = true;
+        document.getElementById("time").disabled = false;
+        i=!i;
+        return;
+      }
+      document.getElementById("agestart").disabled = false;
+      document.getElementById("agestop").disabled = false;
+      document.getElementById("hourstart").disabled = false;
+      document.getElementById("hourstop").disabled = false;
+      document.getElementById("time").disabled = true;
+      i=!i;
+      return;
+    }
+    
+    function download(data, filename, type="CO2") {
+      var file = new Blob([data], {type: type});
+      console.log(file);
+          var a = document.createElement("a");
+          url = URL.createObjectURL(file);
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(function() {
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);  
+          }, 0); 
+  }
+    </script>
+    <style>
+      div.box
+      {
+        width:45%;
+        height:90%;
+        overflow:auto;
+        margin: auto;
+        border: 3px solid ;
+        padding: 10px;
+        font-family: "Sans serif";
+      }
+      div.box2
+      {
+        margin-left: 20px;
+        float:"left ";
+        width:47%;
+        height:90%;
+        overflow:auto;
+        margin: auto;
+         
+        padding: 10px;
+        background-color: white;
+      }
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+      }
+
+      input:checked + .slider {
+        background-color: #2196F3;
+      }
+
+      input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+      }
+
+      input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+      }
+
+      .slider.round {
+        border-radius: 34px;
+      }
+
+      .slider.round:before {
+        border-radius: 50%;
+      }
+
+    </style>
+  </head>
+  <body>  
+    <div id="main" style="background-color: white; height:full; width:full">
+      <p align="center" style= "font-size: 40px; font-family: Sans serif"><strong style="color:red">UNIMORE CO2</strong></p>
+      <div id="actual" align="center" class="box" style="color:black;background-color: white;float:right;margin-right:20px;width:47%;height:90.3%;margin-top: 23px;border: 5px solid black;">
+      </div>
+      <br>
+      <div class="box2" align = "center">
+      <div align="center">
+        <label style="color:black; font-size: 18px; font-family:Sans serif"><strong>DATA</strong></label><br>
+
+        <form>
+          <input type="checkbox" id="CO2" name="CO2" value="CO2">
+          <label for="CO2">CO2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>        
+          <input type="checkbox" id="TEM" name="TEM" value="TEM">
+          <label for="TEM">TEM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+          <input type="checkbox" id="HUM" name="HUM" value="HUM">
+          <label for="HUM">HUM</label><br>
+        </form>
+
+      <label style="color:black; font-size: 18px; font-family:Sans serif"><strong>INTERVAL (accurate/approximate)</label>
+      <label class="switch" style="color:white">ddddddddddddddddddd
+        <input type="checkbox" onclick="hide()">
+        <span class="slider round"></span>
+      </label>
+    </div><br>
+      <div id="buttonstart" style="float:center;"> <label style="color:black; font-size: 18px; font-family:Sans serif"><strong>Accurate date and Time</strong></label><br>
+        <input type="text" id="agestart" style="width:100px" value="2021-01-01"><label style="color:black;margin-right:7px;margin-left:3px">Start date</label>
+        <input type="text" id="agestop" value="2023-01-01" style="width:100px"><label style="color:black;margin-right:7px;margin-left:3px">Stop date</label><br>
+        <input type="text" id="hourstart" style="width:100px" value="00:00:00"><label style="color:black;margin-right:7px;margin-left:3px">Start hour</label>
+        <input type="text" id="hourstop" value="00:00:00" style="width:100px"><label style="color:black;margin-right:7px;margin-left:3px">Stop hour</label>
+      </div><br><br>
+      <div style="float:center;">
+        <label style="color:black; font-size: 18px; font-family:Sans serif">How Many Hours Ago?</label><br>
+        <input type="text" id="time" disabled="true" style="width:100px" value="1h">
+      </div><br><br>
+    <button style="width:110px;color:Black; font-size: 18px; font-family:Sans serif" name="confirm"  onclick="valida()" style="color:black; font-size: 18px; font-family:Sans serif"/>Invio</button><br>
+    <button  style="width:110px;color:black; font-size: 18px; font-family:Sans serif" onclick="download($('#actual').html().replaceAll(' <br> ',' \n'),'Misure.csv', 'text/plain')">Download</button><br>
+    <button  style="width:110px;color:black; font-size: 18px; font-family:Sans serif" onclick="redirect()">REAL-TIME</button>
+    </div>
+    <div style="float:center;background-color: white;margin-left:23px; margin-right: 23px; margin-top: 30px;">
+      <canvas id="myChartH" width="100" height="30" style="background-color:white"></canvas>
+      <canvas id="myChartT" width="100" height="30" style="background-color:white"></canvas>
+      <canvas id="myChartC" width="100" height="30" style="background-color:white"></canvas>
+    </div> 
+  </div>
+  </body>
+</html>
