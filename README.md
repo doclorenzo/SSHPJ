@@ -9,7 +9,7 @@ GIT
 1) installare git (https://www.html.it/pag/53180/installazione-di-git/)
 2) creare una cartella che conterrà il repository:  "mkdir gitProj"
 3) inizializzare la repository git dentro la cartella precedentemente creata:  "git init"
-4) scaricare la repository: "git pull https://github.com/doclorenzo/SSHPJ.git"
+4) scaricare la repository: "git pull https://github.com/doclorenzo/SSHPJ"
 
 DOCKER
 installare docker seguendo la documemntazione ufficiale (https://docs.docker.com/engine/install/)
